@@ -8,7 +8,7 @@
         TOMCAT_WEBAPPS="/home/fanjatiana/apache-tomcat-10.1.28/webapps"
 
         # === Variables FW (framework) ===
-        FW_DIR="FW"
+        FW_DIR="FrameWork"
         FW_SRC="$FW_DIR/src/main/java"
         FW_BUILD="$FW_DIR/build"
         FW_JAR="fw.jar"
