@@ -1,6 +1,8 @@
 package main.java.annotations;
-import annotations.Route; 
+import class_annotations.Controller;
+import method_annotations.Route; 
 
+@Controller(value = "TestController")
 public class TestAnnotations {
 
     @Route(value = "/test")
