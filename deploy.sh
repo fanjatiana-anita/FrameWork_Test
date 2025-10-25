@@ -7,7 +7,7 @@
         # === Variables communes ===
         TOMCAT_WEBAPPS="/home/fanjatiana/apache-tomcat-10.1.28/webapps"
 
-        # === Variables FW (framework) ===
+        # === Variables FrameWork (framework) ===
         FW_DIR="FrameWork"
         FW_SRC="$FW_DIR/src/main/java"
         FW_BUILD="$FW_DIR/build"
@@ -21,25 +21,25 @@
         TEST_BUILD="$TEST_DIR/build"
         TEST_LIB="$TEST_DIR/lib"
 
-        # Construire le classpath pour FW (juste servlet-api)
+        # Construire le classpath pour FrameWork (juste servlet-api)
         FW_CLASSPATH="$TEST_LIB/servlet-api.jar"
 
         # Construire le classpath pour Test (tous les jars dans lib)
         CLASSPATH=$(echo $TEST_LIB/*.jar | tr ' ' ':')
 
-        echo "=== Étape 1 : Compilation du Framework (FW) ==="
+        echo "=== Étape 1 : Compilation du Framework (FrameWork) ==="
 
-        # Nettoyage et compilation FW
+        # Nettoyage et compilation FrameWork
         rm -rf "$FW_BUILD"
         mkdir -p "$FW_BUILD"
         javac -cp "$FW_CLASSPATH" -d "$FW_BUILD" $(find "$FW_SRC" -name "*.java")
 
         if [ $? -ne 0 ]; then
-            echo "Erreur de compilation FW"
+            echo "Erreur de compilation FrameWork"
             exit 1
         fi
 
-        # Génération du jar FW
+        # Génération du jar FrameWork
         cd "$FW_BUILD" || exit
         jar cvf "$FW_JAR" $(find . -name "*.class")
         cd ../..
@@ -48,9 +48,9 @@
         mv "$FW_BUILD/$FW_JAR" "$TEST_LIB/"
         echo " Framework compilé et copié dans $TEST_LIB/$FW_JAR"
 
-        # Supprimer le build FW (on garde seulement src dans FW)
+        # Supprimer le build FrameWork (on garde seulement src dans FrameWork)
         rm -rf "$FW_BUILD"
-        echo "Dossier build supprimé dans FW (FW ne contient que le code source)"
+        echo "Dossier build supprimé dans FrameWork (FrameWork ne contient que le code source)"
 
         echo "=== Étape 2 : Compilation du projet Test ==="
 
