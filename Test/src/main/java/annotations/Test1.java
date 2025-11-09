@@ -14,6 +14,5 @@ public class Test1 {
     public void getTest1() {
         System.out.println("INFO : getTest1 executed\n");
 
-
     }
 }
