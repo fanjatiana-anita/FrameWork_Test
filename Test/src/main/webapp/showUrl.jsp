@@ -1,7 +1,6 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" %>  
 <html>
   <body>
-    <h2>URL demandee :</h2>
-    <p><b>${requestedUrl}</b></p>
+    <h2>STATIC RESOURCE FOUND</h2>
   </body>
 </html>

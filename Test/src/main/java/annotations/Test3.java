@@ -11,8 +11,8 @@ public class Test3{
 
     }
     @Route(value = "/get_Test3")
-    public void getTest3() {
+    public double getTest3() {
         System.out.println("INFO : getTest3 executed.\n");
-
+        return 2.0;
     }
 }

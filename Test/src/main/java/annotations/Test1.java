@@ -11,9 +11,7 @@ public class Test1 {
 
     }
     @Route(value = "/add_Test1")
-    public void getTest1() {
-        System.out.println("INFO : getTest1 executed\n");
-
-
+    public String getTest1() {
+        return "Test1 added successfully with String return type";
     }
 }
