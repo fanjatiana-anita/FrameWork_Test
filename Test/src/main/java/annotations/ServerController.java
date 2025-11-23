@@ -3,13 +3,17 @@ package main.java.annotations;
 import class_annotations.Controller;
 import method_annotations.Route; 
 import view.ModelView;
+<<<<<<< HEAD
 import method_annotations.RequestParam;
+=======
+>>>>>>> test_sprint3_bis
 
 @Controller
 public class ServerController {
 
     // public ViewController(){}
 
+<<<<<<< HEAD
     @Route(value = "/servers/get/{id}") 
     public String get(int id) {
         Server a = new Server(id, "127.0.0.1");
@@ -27,3 +31,12 @@ public class ServerController {
     }
 
 }
+=======
+    @Route(value = "/servers/{id}") 
+    public String get(String id) {
+        Server a = new Server(id, "127.0.0.1");
+        return a.getMap();
+    }
+
+}0
+>>>>>>> test_sprint3_bis
