@@ -8,7 +8,7 @@
 </head>
 <body>
     <form action="/test_app/add" method="post">
-        Name :<input type="text"  name="nom">
+        Name :<input type="text"  name="name">
         Number :<input type="number"  name="number">
         <input type="submit" value="Add">
     </form>

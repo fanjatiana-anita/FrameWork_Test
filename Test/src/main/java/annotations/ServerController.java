@@ -3,6 +3,7 @@ package main.java.annotations;
 import class_annotations.Controller;
 import method_annotations.Route; 
 import view.ModelView;
+import method_annotations.RequestParam;
 
 @Controller
 public class ServerController {
@@ -16,8 +17,8 @@ public class ServerController {
     }
 
     @Route(value = "/add") 
-    public String addServer(String name, double number) {
-        return "server: "+name+" successfully added whith "+(number +10) + "numbers";
+    public String addServer(String name, @RequestParam("number") double isa) {
+        return "server: "+name+" successfully added whith "+ isa + "numbers";
     }
 
 }
