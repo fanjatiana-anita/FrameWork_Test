@@ -4,9 +4,13 @@ import class_annotations.Controller;
 import method_annotations.Route; 
 import view.ModelView;
 <<<<<<< HEAD
+<<<<<<< HEAD
 import method_annotations.RequestParam;
 =======
 >>>>>>> test_sprint3_bis
+=======
+import method_annotations.RequestParam;
+>>>>>>> sprint6_bis
 
 @Controller
 public class ServerController {
