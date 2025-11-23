@@ -12,9 +12,7 @@ public class ServerController {
 
     @Route(value = "/servers/{id}") 
     public String get(String id) {
-        Server a = new Server(id, "127.0.0.1");
-        return a.getMap();
-    }
+
 
     @Route(value = "/add") 
     public String addServer(String name, @RequestParam("number") double isa) {

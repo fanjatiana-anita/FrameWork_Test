@@ -14,8 +14,8 @@ public class Server {
         this.server_ip=server_ip;
     }
 
-    public String getIdMap() { return this.server_id; }
-    public void setIdMap(String id) { this.server_id = id;}
+    public int getIdMap() { return this.server_id; }
+    public void setIdMap(int id) { this.server_id = id;}
     public String getMap() {return this.server_ip;}
     public void setMap() {this.server_ip = server_ip;}
 }
