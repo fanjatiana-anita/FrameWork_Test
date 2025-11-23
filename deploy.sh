@@ -22,7 +22,7 @@
         TEST_LIB="$TEST_DIR/lib"
 
         # Construire le classpath pour FrameWork (juste servlet-api)
-        FW_CLASSPATH="$TEST_LIB/servlet-api.jar"
+        FW_CLASSPATH=$(echo $TEST_LIB/*.jar | tr ' ' ':')
 
         # Construire le classpath pour Test (tous les jars dans lib)
         CLASSPATH=$(echo $TEST_LIB/*.jar | tr ' ' ':')
@@ -32,7 +32,7 @@
         # Nettoyage et compilation FrameWork
         rm -rf "$FW_BUILD"
         mkdir -p "$FW_BUILD"
-        javac -cp "$FW_CLASSPATH" -d "$FW_BUILD" $(find "$FW_SRC" -name "*.java")
+        javac -parameters -cp "$FW_CLASSPATH" -d "$FW_BUILD" $(find "$FW_SRC" -name "*.java")
 
         if [ $? -ne 0 ]; then
             echo "Erreur de compilation FrameWork"
@@ -61,7 +61,7 @@
         if [ -d "$TEST_SRC" ]; then
             find "$TEST_SRC" -name "*.java" > sources.txt
             if [ -s sources.txt ]; then
-                javac -cp "$CLASSPATH" -d "$TEST_BUILD/WEB-INF/classes" @sources.txt
+                javac -parameters -cp "$CLASSPATH" -d "$TEST_BUILD/WEB-INF/classes" @sources.txt
             fi
             rm sources.txt
         fi
@@ -87,7 +87,7 @@
 
         #Compilation des classes des fichiers actuelles 
         CLASSPATH="Test/lib/fw.jar:Test/lib/servlet-api.jar"
-        javac -cp "$CLASSPATH" -d Test/build/WEB-INF/classes $(find Test/src/main/java -name "*.java")
+        javac -parameters -cp "$CLASSPATH" -d Test/build/WEB-INF/classes $(find Test/src/main/java -name "*.java")
 
         echo ""
         echo "Déploiement terminé → $TOMCAT_WEBAPPS/$APP_NAME.war"

@@ -15,5 +15,10 @@ public class ServerController {
         return a.getMap();
     }
 
+    @Route(value = "/add") 
+    public String addServer(String name, double number) {
+        return "server: "+name+" successfully added whith "+(number +10) + "numbers";
+    }
+
 }
 
