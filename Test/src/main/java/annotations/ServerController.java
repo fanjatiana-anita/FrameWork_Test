@@ -10,10 +10,15 @@ public class ServerController {
 
     // public ViewController(){}
 
-    @Route(value = "/servers/{id}") 
-    public String get(String id) {
+    @Route(value = "/servers/get/{id}") 
+    public String get(int id) {
         Server a = new Server(id, "127.0.0.1");
-        return a.getMap();
+        return "ID : "+id;
+    }
+    @Route(value = "/servers/{ip}") 
+    public String getIp(String ip) {
+        Server a = new Server(1, ip);
+        return "IP : "+ip;
     }
 
     @Route(value = "/add") 
@@ -22,4 +27,3 @@ public class ServerController {
     }
 
 }
-
