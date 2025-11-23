@@ -18,6 +18,8 @@ public class ViewController {
     public ModelView redirectToHome() {
         ModelView view = new ModelView();
         view.setView("home.jsp");
+        view.setData("test", "test");
+        
         return view;
     }
 
