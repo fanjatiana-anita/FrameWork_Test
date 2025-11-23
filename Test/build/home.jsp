@@ -7,5 +7,6 @@
 </head>
 <body>
     <h1>My first success view</h1>
+    <h2><em>${test}</em></h2>
 </body>
 </html>
