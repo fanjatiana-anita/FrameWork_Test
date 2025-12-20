@@ -5,7 +5,7 @@
         # ============================
 
         # === Variables communes ===
-        TOMCAT_WEBAPPS="/home/fanjatiana/apache-tomcat-10.1.28/webapps"
+        TOMCAT_WEBAPPS="/home/anita/apache-tomcat-10.1.28/webapps"
 
         # === Variables FrameWork (framework) ===
         FW_DIR="FrameWork"
