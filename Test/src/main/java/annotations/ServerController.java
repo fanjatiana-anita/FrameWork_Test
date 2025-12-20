@@ -1,8 +1,12 @@
 package main.java.annotations;
 
+import java.sql.Date;
+
 import class_annotations.Controller;
 import method_annotations.Route; 
 import view.ModelView;
+import method_annotations.PostRouteMapping;
+import method_annotations.GetRouteMapping;
 import method_annotations.RequestParam;
 
 @Controller
@@ -21,9 +25,20 @@ public class ServerController {
         return "IP : "+ip;
     }
 
-    @Route(value = "/add") 
-    public String addServer(String name, @RequestParam("number") double isa) {
-        return "server: "+name+" successfully added whith "+ isa + "numbers";
+    // @GetRouteMapping(value = "/add") 
+    // public String addServer(String name, @RequestParam("number") double isa) {
+    //     return "server: "+name+" successfully added whith GET method";
+    // }
+
+    @GetRouteMapping(value = "/add") 
+    public String addPostServer(String name, @RequestParam("number") double isa) {
+        return "server: "+name+" successfully added whith POST method";
     }
+
+    @Route(value = "/pass") 
+    public Date passAllRoutes(Date date) {
+        return date;
+    }
+
 
 }

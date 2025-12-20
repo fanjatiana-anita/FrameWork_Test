@@ -1,7 +1,7 @@
 package main.java.annotations;
 
 import class_annotations.Controller;
-import method_annotations.Route; 
+import method_annotations.*; 
 import view.ModelView;
 
 @Controller(value = "ViewController")
@@ -20,6 +20,20 @@ public class ViewController {
         view.setView("home.jsp");
         view.setData("test", "test");
         
+        return view;
+    }
+    @GetRouteMapping(value = "/server/{id}")
+    public ModelView redirectToHomeWithId(int id) {
+        ModelView view = new ModelView();
+        view.setView("/addServer.jsp");
+        view.setData("id", id);
+        
+        return view;
+    }
+    @Route("/add_server")
+    public ModelView redirectToServer() {
+        ModelView view = new ModelView();
+        view.setView("addServer.jsp");        
         return view;
     }
 
