@@ -3,11 +3,8 @@ package main.java.annotations;
 import java.sql.Date;
 
 import class_annotations.Controller;
-import method_annotations.Route; 
+import method_annotations.*;
 import view.ModelView;
-import method_annotations.PostRouteMapping;
-import method_annotations.GetRouteMapping;
-import method_annotations.RequestParam;
 
 @Controller
 public class ServerController {
@@ -30,7 +27,8 @@ public class ServerController {
     //     return "server: "+name+" successfully added whith GET method";
     // }
 
-    @GetRouteMapping(value = "/add") 
+    @Json
+    @PostRouteMapping(value = "/add") 
     public String addPostServer(String name, @RequestParam("number") double isa) {
         return "server: "+name+" successfully added whith POST method";
     }
@@ -40,5 +38,9 @@ public class ServerController {
         return date;
     }
 
+    @Route("/add-server")
+    public ModelView showForm() {
+        return new ModelView("addServer.jsp");
+    }
 
 }
