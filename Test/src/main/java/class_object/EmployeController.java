@@ -1,10 +1,9 @@
 package main.java.class_object;
 
-
 import class_annotations.Controller;
 import method_annotations.*;
 import view.ModelView;
-
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -15,27 +14,30 @@ import java.util.Map;
 
 @Controller
 public class EmployeController {
+
     @Json
     @PostRouteMapping(value = "/save-employe")
     public ModelView save(Employe employe) {
         System.out.println(employe.getName());
-        System.out.println(employe.getDepartement().getName());
-        
+        if (employe.getDepartement() != null) {
+            System.out.println(employe.getDepartement().getName());
+        }
         ModelView mv = new ModelView("afterAddEmp.jsp");
         mv.setData("emp", employe);
         return mv;
     }
+
     @Route("/add-emp")
     public ModelView showForm() {
         return new ModelView("addEmp.jsp");
     }
-    
-    @Json
+
     @PostRouteMapping(value = "/save-employe-with-file")
     public ModelView saveWithFile(
             Employe employe,
-            Map<String, List<byte[]>> uploadedFiles,  // Une seule Map, gère tout
-            Map<String, Object> formData
+            Map<String, List<byte[]>> uploadedFiles,
+            Map<String, Object> formData,
+            HttpServletRequest request
     ) {
         System.out.println("=== DONNÉES EMPLOYÉ ===");
         System.out.println("Nom Employé : " + employe.getName());
@@ -53,12 +55,12 @@ public class EmployeController {
             }
         });
 
-        // === Sauvegarde des fichiers ===
-        String uploadDirPath = System.getProperty("user.home")
-                + "/apache-tomcat-10.1.28/webapps/test_app/uploads";
+        // === CHEMIN D'UPLOAD DYNAMIQUE ET PORTABLE ===
+        String uploadDirPath = request.getServletContext().getRealPath("/uploads/");
         File uploadDir = new File(uploadDirPath);
         if (!uploadDir.exists()) {
             uploadDir.mkdirs();
+            System.out.println("Dossier /uploads créé automatiquement : " + uploadDirPath);
         }
 
         List<String> savedFiles = new ArrayList<>();
@@ -68,43 +70,46 @@ public class EmployeController {
             List<byte[]> files = entry.getValue();
             for (int i = 0; i < files.size(); i++) {
                 byte[] bytes = files.get(i);
-                String fileName = fieldName + (files.size() > 1 ? "_" + i : "") + "_" + System.currentTimeMillis() + ".uploaded";
-                String filePath = uploadDirPath + File.separator + fileName;
-                try (FileOutputStream fos = new FileOutputStream(filePath)) {
+                String fileName = fieldName + (files.size() > 1 ? "_" + i : "")
+                        + "_" + System.currentTimeMillis() + ".uploaded";
+                String fullPath = uploadDirPath + fileName;
+
+                try (FileOutputStream fos = new FileOutputStream(fullPath)) {
                     fos.write(bytes);
-                    savedFiles.add("/test_app/uploads/" + fileName);
-                    System.out.println("Fichier sauvegardé (" + fieldName + ") : " + filePath + " (" + bytes.length + " bytes)");
+                    savedFiles.add("/uploads/" + fileName);  // URL accessible
+                    System.out.println("Fichier sauvegardé : " + fullPath + " (" + bytes.length + " bytes)");
                 } catch (IOException e) {
-                    System.err.println("Erreur sauvegarde : " + e.getMessage());
+                    System.err.println("Erreur lors de la sauvegarde du fichier : " + e.getMessage());
                 }
             }
         }
 
-        // Retour
         ModelView mv = new ModelView("afterUpload.jsp");
         mv.setData("employe", employe);
         mv.setData("savedFiles", savedFiles);
         mv.setData("formData", formData);
-        mv.setData("message", savedFiles.isEmpty() 
-                ? "Employé ajouté (sans fichier)." 
+        mv.setData("message", savedFiles.isEmpty()
+                ? "Employé ajouté (sans fichier)."
                 : "Employé + " + savedFiles.size() + " fichier(s) uploadé(s) !");
         return mv;
     }
 
     @PostRouteMapping(value = "/save-employe-full-test")
     public ModelView saveFullTest(
-            Employe employe,                                              // Binding objet complexe
-            @RequestParam("poste") String posteAnnoté,                    // Paramètre annoté
-            String salaire,                                               // Paramètre simple SANS annotation (par nom de variable)
-            Map<String, List<byte[]>> uploadedFiles,                      // Tous les fichiers (single + multiple)
-            Map<String, Object> formData                                  // Tous les params texte
+            Employe employe,
+            @RequestParam("poste") String posteAnnoté,
+            String salaire,
+            Map<String, List<byte[]>> uploadedFiles,
+            Map<String, Object> formData,
+            HttpServletRequest request
     ) {
         System.out.println("=== TEST COMPLET ===");
-        System.out.println("Employé : " + employe.getName() + " (Dépt: " + employe.getDepartement().getName() + ")");
+        System.out.println("Employé : " + employe.getName() + " (Dépt: " + 
+                (employe.getDepartement() != null ? employe.getDepartement().getName() : "aucun") + ")");
         System.out.println("Poste (annoté) : " + posteAnnoté);
-        System.out.println("Salaire (simple, sans annotation) : " + salaire);
-        System.out.println("Nombre de fichiers uploadés : " + 
-            uploadedFiles.values().stream().mapToInt(List::size).sum());
+        System.out.println("Salaire (simple) : " + salaire);
+        System.out.println("Nombre de fichiers uploadés : " +
+                uploadedFiles.values().stream().mapToInt(List::size).sum());
 
         formData.forEach((k, v) -> {
             if (v.getClass().isArray()) {
@@ -114,23 +119,25 @@ public class EmployeController {
             }
         });
 
-        // Sauvegarde fichiers (comme avant)
-        String uploadDirPath = System.getProperty("user.home")
-                + "/apache-tomcat-10.1.28/webapps/test_app/uploads";
+        // Même logique dynamique que dans saveWithFile
+        String uploadDirPath = request.getServletContext().getRealPath("/uploads/");
         File uploadDir = new File(uploadDirPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
+        if (!uploadDir.exists()) {
+            uploadDir.mkdirs();
+        }
 
         List<String> savedFiles = new ArrayList<>();
         for (Map.Entry<String, List<byte[]>> entry : uploadedFiles.entrySet()) {
             String field = entry.getKey();
-            for (int i = 0; i < entry.getValue().size(); i++) {
-                byte[] bytes = entry.getValue().get(i);
-                String fileName = field + (entry.getValue().size() > 1 ? "_" + i : "") 
+            List<byte[]> files = entry.getValue();
+            for (int i = 0; i < files.size(); i++) {
+                byte[] bytes = files.get(i);
+                String fileName = field + (files.size() > 1 ? "_" + i : "")
                         + "_" + System.currentTimeMillis() + ".uploaded";
-                String path = uploadDirPath + File.separator + fileName;
-                try (FileOutputStream fos = new FileOutputStream(path)) {
+                String fullPath = uploadDirPath + fileName;
+                try (FileOutputStream fos = new FileOutputStream(fullPath)) {
                     fos.write(bytes);
-                    savedFiles.add("/test_app/uploads/" + fileName);
+                    savedFiles.add("/uploads/" + fileName);
                 } catch (IOException e) {
                     System.err.println("Erreur sauvegarde : " + e.getMessage());
                 }
@@ -141,7 +148,7 @@ public class EmployeController {
         mv.setData("employe", employe);
         mv.setData("savedFiles", savedFiles);
         mv.setData("formData", formData);
-        mv.setData("message", "TEST COMPLET RÉUSSI ! Tout fonctionne.");
+        mv.setData("message", "TEST COMPLET RÉUSSI ! Tout fonctionne parfaitement.");
         return mv;
     }
 }
