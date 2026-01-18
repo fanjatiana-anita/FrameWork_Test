@@ -37,7 +37,7 @@ public class EmployeController {
             Employe employe,
             Map<String, List<byte[]>> uploadedFiles,
             Map<String, Object> formData,
-            HttpServletRequest request
+            HttpServletRequest request  // Injecté automatiquement par le framework
     ) {
         System.out.println("=== DONNÉES EMPLOYÉ ===");
         System.out.println("Nom Employé : " + employe.getName());
@@ -55,7 +55,7 @@ public class EmployeController {
             }
         });
 
-        // === CHEMIN D'UPLOAD DYNAMIQUE ET PORTABLE ===
+        // === CHEMIN D'UPLOAD TOTALEMENT DYNAMIQUE ===
         String uploadDirPath = request.getServletContext().getRealPath("/uploads/");
         File uploadDir = new File(uploadDirPath);
         if (!uploadDir.exists()) {
@@ -76,7 +76,7 @@ public class EmployeController {
 
                 try (FileOutputStream fos = new FileOutputStream(fullPath)) {
                     fos.write(bytes);
-                    savedFiles.add("/uploads/" + fileName);  // URL accessible
+                    savedFiles.add("/uploads/" + fileName);  // URL propre et accessible
                     System.out.println("Fichier sauvegardé : " + fullPath + " (" + bytes.length + " bytes)");
                 } catch (IOException e) {
                     System.err.println("Erreur lors de la sauvegarde du fichier : " + e.getMessage());
@@ -101,10 +101,10 @@ public class EmployeController {
             String salaire,
             Map<String, List<byte[]>> uploadedFiles,
             Map<String, Object> formData,
-            HttpServletRequest request
+            HttpServletRequest request  // Injecté ici aussi
     ) {
         System.out.println("=== TEST COMPLET ===");
-        System.out.println("Employé : " + employe.getName() + " (Dépt: " + 
+        System.out.println("Employé : " + employe.getName() + " (Dépt: " +
                 (employe.getDepartement() != null ? employe.getDepartement().getName() : "aucun") + ")");
         System.out.println("Poste (annoté) : " + posteAnnoté);
         System.out.println("Salaire (simple) : " + salaire);
