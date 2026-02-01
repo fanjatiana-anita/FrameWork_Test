@@ -18,6 +18,10 @@ import java.util.Map;
 @Controller
 public class EmployeController {
 
+    // ========================================
+    // MÉTHODES ORIGINALES
+    // ========================================
+
     @Json
     @PostRouteMapping(value = "/save-employe")
     public ModelView save(Employe employe) {
@@ -150,31 +154,46 @@ public class EmployeController {
         mv.setData("message", "TEST COMPLET RÉUSSI ! Tout fonctionne parfaitement.");
         return mv;
     }
+
+    // ========================================
+    // AUTHENTIFICATION ET SESSION
+    // ========================================
+
+    @GetRouteMapping(value = "/login")
+    public ModelView showLoginForm() {
+        return new ModelView("login.jsp");
+    }
+
     @PostRouteMapping(value = "/login")
     public ModelView login(
             @RequestParam("username") String username,
             @RequestParam("password") String password,
             @Session Map<String, Object> session
     ) {
-        System.out.println("🔍 DEBUG LOGIN - username reçu : '" + username + "'");
-        System.out.println("🔍 DEBUG LOGIN - password reçu : '" + password + "'");
-        System.out.println("🔍 DEBUG LOGIN - session reçue : " + session);
-        System.out.println("🔍 DEBUG LOGIN - session identityHashCode : " + System.identityHashCode(session));
+        System.out.println("🔍 DEBUG LOGIN - username : '" + username + "'");
+        System.out.println("🔍 DEBUG LOGIN - password : '" + password + "'");
         
-        System.out.println("🔍 Comparaison username : admin.equals(username) = " + "admin".equals(username));
-        System.out.println("🔍 Comparaison password : 1234.equals(password) = " + "1234".equals(password));
+        // Vérifications pour les tests
+        String role = null;
         
         if ("admin".equals(username) && "1234".equals(password)) {
-            System.out.println("✅ ENTRÉE DANS LE IF - Login réussi");
+            role = "admin";
+        } else if ("manager".equals(username) && "1234".equals(password)) {
+            role = "manager";
+        } else if ("user".equals(username) && "1234".equals(password)) {
+            role = "user";
+        }
+        
+        if (role != null) {
+            System.out.println("✅ Login réussi");
             
             session.put("userId", username);
-            session.put("role", "admin");
+            session.put("role", role);
             session.put("loggedIn", true);
             session.put("lastLogin", new java.util.Date());
             
-            System.out.println("✅ Login réussi pour : " + username);
-            System.out.println("🔍 Après put - session : " + session);
-            System.out.println("🔍 Après put - session.size() : " + session.size());
+            System.out.println("✅ Login réussi pour : " + username + " (rôle: " + role + ")");
+            System.out.println("🔍 Session : " + session);
 
             return new ModelView("redirect:/dashboard");
         } else {
@@ -184,10 +203,6 @@ public class EmployeController {
             return mv;
         }
     }
-    @GetRouteMapping(value = "/login")
-        public ModelView showLoginForm() {
-            return new ModelView("login.jsp");
-        }
 
     @GetRouteMapping(value = "/dashboard")
     public ModelView dashboard(@Session Map<String, Object> session) {
@@ -212,15 +227,17 @@ public class EmployeController {
 
     @GetRouteMapping(value = "/logout")
     public ModelView logout(@Session Map<String, Object> session) {
-        session.clear(); // Vide la map → synchronisé automatiquement
+        session.clear();
         
         ModelView mv = new ModelView("login.jsp");
         mv.setData("message", "Déconnexion réussie");
         return mv;
     }
-    /**
-     * TEST 1 : Afficher toutes les données de session
-     */
+
+    // ========================================
+    // TESTS DE SESSION
+    // ========================================
+
     @GetRouteMapping(value = "/session_show")
     public ModelView showSession(@Session Map<String, Object> session) {
         System.out.println("=== AFFICHAGE SESSION ===");
@@ -232,9 +249,6 @@ public class EmployeController {
         return mv;
     }
 
-    /**
-     * TEST 2 : Ajouter/Modifier une valeur dans la session
-     */
     @GetRouteMapping(value = "/session_add")
     public ModelView addToSession(
             @RequestParam("key") String key,
@@ -254,9 +268,6 @@ public class EmployeController {
         return new ModelView("redirect:/session_show");
     }
 
-    /**
-     * TEST 3 : Supprimer une clé de la session
-     */
     @GetRouteMapping(value = "/session_remove")
     public ModelView removeFromSession(
             @RequestParam("key") String key,
@@ -274,9 +285,6 @@ public class EmployeController {
         return new ModelView("redirect:/session_show");
     }
 
-    /**
-     * TEST 4 : Vider complètement la session
-     */
     @GetRouteMapping(value = "/session_clear")
     public ModelView clearSession(@Session Map<String, Object> session) {
         System.out.println("=== VIDAGE SESSION ===");
@@ -289,9 +297,6 @@ public class EmployeController {
         return new ModelView("redirect:/session_show");
     }
 
-    /**
-     * TEST 5 : Modifier le rôle d'un utilisateur connecté
-     */
     @GetRouteMapping(value = "/session_change-role")
     public ModelView changeRole(
             @RequestParam("newRole") String newRole,
@@ -316,28 +321,22 @@ public class EmployeController {
         return new ModelView("redirect:/dashboard");
     }
 
-    /**
-     * TEST 6 : Ajouter des données complexes (liste, objet)
-     */
     @GetRouteMapping(value = "/session_add-complex")
     public ModelView addComplexData(@Session Map<String, Object> session) {
         System.out.println("=== AJOUT DONNÉES COMPLEXES ===");
         
-        // Ajouter une liste
         List<String> favoriteColors = new ArrayList<>();
         favoriteColors.add("Rouge");
         favoriteColors.add("Bleu");
         favoriteColors.add("Vert");
         session.put("favoriteColors", favoriteColors);
         
-        // Ajouter un Map
         Map<String, Object> preferences = new HashMap<>();
         preferences.put("theme", "dark");
         preferences.put("language", "fr");
         preferences.put("notifications", true);
         session.put("preferences", preferences);
         
-        // Ajouter un compteur
         Integer visitCount = (Integer) session.get("visitCount");
         session.put("visitCount", visitCount == null ? 1 : visitCount + 1);
         
@@ -346,9 +345,6 @@ public class EmployeController {
         return new ModelView("redirect:/session_show");
     }
 
-    /**
-     * TEST 7 : Vérifier la persistance de la session entre requêtes
-     */
     @GetRouteMapping(value = "/session_increment")
     public ModelView incrementCounter(@Session Map<String, Object> session) {
         Integer counter = (Integer) session.get("counter");
@@ -371,15 +367,11 @@ public class EmployeController {
         return mv;
     }
 
-    /**
-     * TEST 8 : Test de remplacement complet des données
-     */
     @GetRouteMapping(value = "/session_replace-all")
     public ModelView replaceAllSession(@Session Map<String, Object> session) {
         System.out.println("=== REMPLACEMENT COMPLET SESSION ===");
         System.out.println("Avant : " + session);
         
-        // Vider et remplacer
         session.clear();
         session.put("newKey1", "value1");
         session.put("newKey2", "value2");
@@ -390,8 +382,125 @@ public class EmployeController {
         
         return new ModelView("redirect:/session_show");
     }
+
     @GetRouteMapping(value = "/session-tests")
-        public ModelView showSessionTests() {
-            return new ModelView("sessionTests.jsp");
-        }
+    public ModelView showSessionTests() {
+        return new ModelView("sessionTests.jsp");
+    }
+
+    // ========================================
+    // TESTS D'AUTHENTIFICATION ET RÔLES
+    // ========================================
+
+    /**
+     * Page accessible à tous (pas d'annotation)
+     */
+    @GetRouteMapping(value = "/public")
+    public ModelView publicPage() {
+        ModelView mv = new ModelView("publicPage.jsp");
+        mv.setData("message", "Cette page est accessible à tous, même sans être connecté");
+        return mv;
+    }
+
+    /**
+     * Page nécessitant une authentification
+     */
+    @Authentified
+    @GetRouteMapping(value = "/protected")
+    public ModelView protectedPage(@Session Map<String, Object> session) {
+        ModelView mv = new ModelView("protectedPage.jsp");
+        mv.setData("message", "Bravo ! Vous êtes authentifié");
+        mv.setData("user", session.get("userId"));
+        return mv;
+    }
+
+    /**
+     * Page accessible uniquement aux admins
+     */
+    @Role({"admin"})
+    @GetRouteMapping(value = "/admin-only")
+    public ModelView adminOnlyPage(@Session Map<String, Object> session) {
+        ModelView mv = new ModelView("rolePage.jsp");
+        mv.setData("message", "Bienvenue Admin ! Vous avez accès à cette page");
+        mv.setData("role", session.get("role"));
+        mv.setData("pageType", "Admin Only");
+        return mv;
+    }
+
+    /**
+     * Page accessible aux admins ET aux managers
+     */
+    @Role({"admin", "manager"})
+    @GetRouteMapping(value = "/admin-or-manager")
+    public ModelView adminOrManagerPage(@Session Map<String, Object> session) {
+        ModelView mv = new ModelView("rolePage.jsp");
+        mv.setData("message", "Vous êtes soit Admin soit Manager");
+        mv.setData("role", session.get("role"));
+        mv.setData("pageType", "Admin or Manager");
+        return mv;
+    }
+
+    /**
+     * Page accessible uniquement aux managers
+     */
+    @Role({"manager"})
+    @GetRouteMapping(value = "/manager-only")
+    public ModelView managerOnlyPage(@Session Map<String, Object> session) {
+        ModelView mv = new ModelView("rolePage.jsp");
+        mv.setData("message", "Bienvenue Manager !");
+        mv.setData("role", session.get("role"));
+        mv.setData("pageType", "Manager Only");
+        return mv;
+    }
+
+    /**
+     * Page pour utilisateurs simples
+     */
+    @Role({"user"})
+    @GetRouteMapping(value = "/user-only")
+    public ModelView userOnlyPage(@Session Map<String, Object> session) {
+        ModelView mv = new ModelView("rolePage.jsp");
+        mv.setData("message", "Bienvenue utilisateur simple !");
+        mv.setData("role", session.get("role"));
+        mv.setData("pageType", "User Only");
+        return mv;
+    }
+
+    /**
+     * API protégée retournant du JSON
+     */
+    @Json
+    @Authentified
+    @GetRouteMapping(value = "/api/user-info")
+    public Map<String, Object> getUserInfo(@Session Map<String, Object> session) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("userId", session.get("userId"));
+        result.put("role", session.get("role"));
+        result.put("loggedIn", session.get("loggedIn"));
+        result.put("timestamp", new java.util.Date());
+        return result;
+    }
+
+    /**
+     * API admin retournant du JSON
+     */
+    @Json
+    @Role({"admin"})
+    @GetRouteMapping(value = "/api/admin/stats")
+    public Map<String, Object> getAdminStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalUsers", 150);
+        stats.put("activeUsers", 42);
+        stats.put("serverUptime", "15 days");
+        stats.put("message", "Statistiques réservées aux admins");
+        return stats;
+    }
+
+    /**
+     * Page de test des permissions
+     */
+    @GetRouteMapping(value = "/test-permissions")
+    public ModelView testPermissions() {
+        return new ModelView("testPermissions.jsp");
+    }
 }
